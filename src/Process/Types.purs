@@ -3,41 +3,59 @@ module Process.Types where
 import Prelude
 import Data.Maybe (Maybe(..))
 
--- | An actor participating in a process (e.g. Controller, Chain, SA)
 type Actor =
   { id :: String
   , label :: String
-  , lane :: Int -- visual lane position (0 = left, 1 = center, 2 = right, ...)
+  , lane :: Int
   }
 
--- | A single step in a process
-type Step =
-  { id :: String
-  , label :: String
-  , description :: Maybe String
-  , actor :: String -- actor id who initiates
-  , target :: Maybe String -- target actor id (e.g. Chain for transactions)
-  , stepType :: StepType
-  , order :: Int
-  }
-
--- | What kind of step this is
 data StepType
-  = Transaction -- on-chain transaction
-  | OffChain -- off-chain activity
-  | Query -- read-only query
+  = OnChain
+  | OffChain
 
 derive instance eqStepType :: Eq StepType
 
--- | A deadline constraint on a process
-type Deadline =
+type DatumChange =
   { label :: String
-  , duration :: String -- e.g. "PT72H", "P1M"
-  , fromStep :: String -- step id
-  , toStep :: String -- step id
+  , field :: String
+  , beforeValue :: String
+  , afterValue :: String
   }
 
--- | A complete process definition parsed from RDF
+type SignatureReq =
+  { label :: String
+  , party :: String
+  , sigType :: String
+  }
+
+type LifecycleState =
+  { id :: String
+  , label :: String
+  , description :: Maybe String
+  }
+
+type Step =
+  { id :: String
+  , label :: String
+  , narrative :: Maybe String
+  , actor :: String
+  , stepType :: StepType
+  , order :: Int
+  , fromState :: Maybe String
+  , toState :: Maybe String
+  , signatures :: Array SignatureReq
+  , checks :: Array String
+  , datumChanges :: Array DatumChange
+  , action :: Maybe String
+  }
+
+type Deadline =
+  { label :: String
+  , duration :: String
+  , fromState :: String
+  , toState :: String
+  }
+
 type ProcessDef =
   { id :: String
   , label :: String
@@ -45,9 +63,9 @@ type ProcessDef =
   , actors :: Array Actor
   , steps :: Array Step
   , deadlines :: Array Deadline
+  , lifecycleStates :: Array LifecycleState
   }
 
--- | Animation playback state
 data PlaybackState
   = Stopped
   | Playing
@@ -55,7 +73,6 @@ data PlaybackState
 
 derive instance eqPlaybackState :: Eq PlaybackState
 
--- | The current state of the animator
 type AnimatorState =
   { process :: Maybe ProcessDef
   , currentStep :: Int
