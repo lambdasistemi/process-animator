@@ -2,6 +2,7 @@ module Process.Types where
 
 import Prelude
 import Data.Maybe (Maybe(..))
+import Effect.Timer (IntervalId)
 
 type Actor =
   { id :: String
@@ -78,6 +79,7 @@ type AnimatorState =
   , currentStep :: Int
   , playback :: PlaybackState
   , error :: Maybe String
+  , tickTimer :: Maybe IntervalId
   }
 
 initialState :: AnimatorState
@@ -86,4 +88,5 @@ initialState =
   , currentStep: 0
   , playback: Stopped
   , error: Nothing
+  , tickTimer: Nothing
   }

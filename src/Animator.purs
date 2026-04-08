@@ -7,13 +7,14 @@ import Data.Maybe (Maybe(..), fromMaybe, isJust)
 import Data.String (null) as Str
 import Data.String.Common (split) as Str
 import Data.String.Pattern (Pattern(..))
-import Effect.Aff (Milliseconds(..), delay)
 import Effect.Aff.Class (class MonadAff, liftAff)
 import Effect.Class (liftEffect)
+import Effect.Timer (clearInterval, setInterval)
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
+import Halogen.Subscription as HS
 import Process.Load (loadFromUrl)
 import Process.Types (AnimatorState, DatumChange, PlaybackState(..), ProcessDef, SignatureReq, Step, StepType(..), initialState)
 import Web.HTML (window)
@@ -353,13 +354,11 @@ handleAction = case _ of
   TogglePlay -> do
     state <- H.get
     case state.playback of
-      Playing ->
-        H.modify_ \s -> s { playback = Paused }
-      _ -> do
-        H.modify_ \s -> s { playback = Playing }
-        startPlayback
+      Playing -> stopPlayback
+      _ -> startPlayback
 
-  Reset ->
+  Reset -> do
+    stopPlayback
     H.modify_ \s -> s { currentStep = 0, playback = Stopped }
 
   LoadResult mp ->
@@ -372,18 +371,27 @@ handleAction = case _ of
     state <- H.get
     case state.playback of
       Playing ->
-        if canStepForward state then do
+        if canStepForward state then
           H.modify_ \s -> s { currentStep = s.currentStep + 1 }
-          liftAff $ delay (Milliseconds 2500.0)
-          handleAction Tick
         else
-          H.modify_ \s -> s { playback = Stopped }
+          stopPlayback
       _ -> pure unit
 
 startPlayback :: forall cs o m. MonadAff m => H.HalogenM AnimatorState Action cs o m Unit
 startPlayback = do
-  liftAff $ delay (Milliseconds 2500.0)
-  handleAction Tick
+  { emitter, listener } <- liftEffect HS.create
+  timerRef <- liftEffect $ setInterval 2500 do
+    HS.notify listener Tick
+  void $ H.subscribe emitter
+  H.modify_ \s -> s { playback = Playing, tickTimer = Just timerRef }
+
+stopPlayback :: forall cs o m. MonadAff m => H.HalogenM AnimatorState Action cs o m Unit
+stopPlayback = do
+  state <- H.get
+  case state.tickTimer of
+    Just ref -> liftEffect $ clearInterval ref
+    Nothing -> pure unit
+  H.modify_ \s -> s { playback = Stopped, tickTimer = Nothing }
 
 extractParam :: String -> String -> Maybe String
 extractParam key qs =
