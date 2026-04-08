@@ -11,56 +11,23 @@
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
     background: #0d1117;
     color: #c9d1d9;
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh;
   }
 
   .animator {
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    min-height: 100vh;
   }
 
-  /* Controls */
-  .controls {
-    display: flex;
-    gap: 8px;
-    padding: 12px;
-    background: #161b22;
-    border-bottom: 1px solid #30363d;
-    z-index: 5;
-  }
-
-  .control-btn {
-    background: #21262d;
-    border: 1px solid #30363d;
-    color: #c9d1d9;
-    padding: 6px 14px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 13px;
-    font-family: inherit;
-    transition: all 0.15s ease;
-  }
-
-  .control-btn:hover { background: #30363d; border-color: #8b949e; }
-  .control-btn:disabled { opacity: 0.4; cursor: default; }
-  .control-btn:disabled:hover { background: #21262d; border-color: #30363d; }
-
-  /* Empty & Error states */
+  /* Empty & Error */
   .empty-state, .error-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    flex: 1;
-    color: #8b949e;
-    text-align: center;
-    padding: 40px;
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; flex: 1; color: #8b949e;
+    text-align: center; padding: 60px 20px;
   }
-
-  .empty-state h2, .error-state h2 { font-size: 24px; color: #f0f6fc; margin-bottom: 8px; }
-  .empty-state p, .error-state p { font-size: 14px; line-height: 1.5; }
+  .empty-state h2, .error-state h2 { font-size: 28px; color: #f0f6fc; margin-bottom: 8px; }
+  .empty-state p { font-size: 14px; line-height: 1.6; margin-top: 4px; }
   .error-state { color: #f85149; }
   .error-state h2 { color: #f85149; }
 
@@ -68,26 +35,54 @@
   .process-view {
     display: flex;
     flex-direction: column;
-    flex: 1;
-    overflow: hidden;
+    max-width: 720px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 0 20px;
   }
 
-  .process-title {
-    font-size: 18px;
-    font-weight: 600;
+  /* Header */
+  .process-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 24px 0 16px;
+    border-bottom: 1px solid #21262d;
+    gap: 20px;
+  }
+
+  .process-header h1 {
+    font-size: 22px;
     color: #f0f6fc;
-    padding: 12px 16px;
-    border-bottom: 1px solid #30363d;
+    font-weight: 600;
+    line-height: 1.3;
   }
 
-  /* Deadline bar */
-  .deadline-bar {
-    padding: 8px 16px;
-    background: #161b22;
-    border-bottom: 1px solid #30363d;
+  .process-desc {
+    font-size: 13px;
+    color: #8b949e;
+    line-height: 1.5;
+    margin-top: 4px;
   }
 
-  .deadline-label {
+  .process-header-right {
+    flex-shrink: 0;
+    text-align: right;
+  }
+
+  .step-counter {
+    font-size: 13px;
+    color: #8b949e;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  /* Deadline */
+  .deadline {
+    margin-top: 4px;
+  }
+
+  .deadline-text {
     font-size: 11px;
     font-weight: 600;
     color: #d29922;
@@ -97,236 +92,307 @@
   }
 
   .deadline-track {
-    height: 6px;
+    height: 4px;
     background: #21262d;
-    border-radius: 3px;
+    border-radius: 2px;
     overflow: hidden;
+    width: 140px;
   }
 
   .deadline-fill {
     height: 100%;
     background: linear-gradient(90deg, #3fb950, #d29922, #f85149);
-    border-radius: 3px;
+    border-radius: 2px;
     transition: width 0.5s ease;
   }
 
-  /* Lanes */
-  .lanes-container {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    overflow: hidden;
-  }
-
-  .lanes {
-    display: flex;
-    flex: 1;
-    overflow: hidden;
-  }
-
-  .lane {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    border-right: 1px solid #30363d;
-  }
-
-  .lane:last-child { border-right: none; }
-
-  .lane-header {
-    padding: 10px 16px;
-    font-size: 13px;
-    font-weight: 600;
-    color: #f0f6fc;
-    background: #161b22;
-    border-bottom: 1px solid #30363d;
-    text-align: center;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  .lane-body {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 12px;
-    overflow-y: auto;
-  }
-
-  /* Chain state box */
-  .chain-state-box {
-    padding: 8px 12px;
-    margin: 8px;
-    background: #0d1117;
-    border: 1px solid #30363d;
-    border-radius: 6px;
-    transition: all 0.5s ease;
-  }
-
-  .chain-state-label {
-    font-size: 12px;
-    font-weight: 600;
-    color: #8b949e;
-    text-align: center;
-    transition: all 0.3s ease;
-  }
-
-  .chain-state-label.chain-state-active {
-    color: #58a6ff;
-    animation: state-morph 0.6s ease;
-  }
-
-  @keyframes state-morph {
-    0% { transform: scaleY(0.8); opacity: 0.5; }
-    50% { transform: scaleY(1.1); }
-    100% { transform: scaleY(1); opacity: 1; }
-  }
-
-  /* Datum changes in chain state box */
-  .datum-changes {
-    margin-top: 6px;
-    font-size: 10px;
-  }
-
-  .datum-change {
+  /* Chain state banner */
+  .chain-state-banner {
     display: flex;
     align-items: center;
-    gap: 4px;
-    padding: 2px 0;
-    animation: fade-in 0.4s ease;
+    gap: 8px;
+    padding: 10px 14px;
+    margin: 12px 0;
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
   }
 
-  .datum-field {
-    color: #d2a8ff;
-    font-weight: 600;
-    font-family: monospace;
-  }
-
-  .datum-before { color: #f85149; text-decoration: line-through; }
-  .datum-arrow { color: #8b949e; }
-  .datum-after { color: #3fb950; }
-
-  /* Step markers */
-  .step-marker {
-    padding: 8px 12px;
-    border-radius: 6px;
+  .chain-label {
     font-size: 12px;
-    min-height: 32px;
+    color: #8b949e;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .chain-value {
+    font-size: 14px;
+    color: #8b949e;
+    font-weight: 600;
+  }
+
+  .chain-value-active {
+    color: #58a6ff;
+    animation: pulse 0.5s ease;
+  }
+
+  @keyframes pulse {
+    0% { opacity: 0.5; transform: scale(0.95); }
+    50% { transform: scale(1.02); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
+  /* Controls */
+  .controls {
+    display: flex;
+    gap: 8px;
+    padding: 12px 0;
+    justify-content: center;
+  }
+
+  .control-btn {
+    background: #21262d;
+    border: 1px solid #30363d;
+    color: #c9d1d9;
+    padding: 8px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: inherit;
+    transition: all 0.15s ease;
+  }
+
+  .control-btn:hover { background: #30363d; border-color: #8b949e; }
+  .control-btn:disabled { opacity: 0.3; cursor: default; }
+  .control-btn:disabled:hover { background: #21262d; border-color: #30363d; }
+  .control-btn-play { background: #1f3a5f; border-color: #58a6ff; color: #58a6ff; }
+  .control-btn-play:hover { background: #264d78; }
+
+  /* Timeline */
+  .timeline {
+    padding: 8px 0 40px;
+  }
+
+  /* Step card */
+  .step-card {
+    display: flex;
+    gap: 16px;
+    padding: 0 0 0 0;
     transition: all 0.3s ease;
   }
 
-  .step-marker.owns {
-    background: #21262d;
-    border: 1px solid #30363d;
-    color: #8b949e;
+  /* Step connector (number + line) */
+  .step-connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+    width: 36px;
   }
 
-  .step-marker.owns.active {
+  .step-number {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    background: #21262d;
+    border: 2px solid #30363d;
+    color: #8b949e;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+  }
+
+  .step-active .step-number {
     background: #1f3a5f;
     border-color: #58a6ff;
     color: #58a6ff;
-    box-shadow: 0 0 12px rgba(88, 166, 255, 0.2);
-    animation: fade-in 0.3s ease;
+    box-shadow: 0 0 12px rgba(88, 166, 255, 0.3);
   }
 
-  .step-marker.owns.completed {
+  .step-completed .step-number {
     background: #1a3b2f;
     border-color: #3fb950;
     color: #3fb950;
   }
 
-  .step-marker.offchain-active {
-    background: #2d1f3a;
-    border-color: #d2a8ff;
-    color: #d2a8ff;
-    box-shadow: 0 0 12px rgba(210, 168, 255, 0.2);
+  .step-line {
+    width: 2px;
+    flex: 1;
+    min-height: 16px;
+    background: #21262d;
+    transition: background 0.3s ease;
   }
 
-  /* Transaction arrows */
-  .tx-arrow {
-    position: absolute;
-    top: 50%;
-    height: 4px;
-    z-index: 10;
-    pointer-events: none;
-    animation: arrow-fly 0.6s ease forwards;
+  .step-completed .step-line { background: #3fb950; }
+  .step-active .step-line { background: #58a6ff; }
+
+  /* Step content */
+  .step-content {
+    flex: 1;
+    padding: 4px 0 24px;
+    min-width: 0;
   }
 
-  .arrow-line {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: #58a6ff;
-    box-shadow: 0 0 8px rgba(88, 166, 255, 0.5);
-  }
+  .step-future .step-content { opacity: 0.4; }
 
-  .arrow-head {
-    position: absolute;
-    top: -4px;
-    width: 0;
-    height: 0;
-    border-top: 5px solid transparent;
-    border-bottom: 5px solid transparent;
-  }
-
-  .tx-arrow-right .arrow-head {
-    right: 0;
-    border-left: 8px solid #58a6ff;
-  }
-
-  .tx-arrow-left .arrow-head {
-    left: 0;
-    border-right: 8px solid #58a6ff;
-  }
-
-  @keyframes arrow-fly {
-    0% { opacity: 0; transform: scaleX(0); }
-    50% { opacity: 1; }
-    100% { opacity: 1; transform: scaleX(1); }
-  }
-
-  /* Step info panel */
-  .step-info {
-    padding: 16px;
-    background: #161b22;
-    border-top: 1px solid #30363d;
-    min-height: 80px;
-    max-height: 200px;
-    overflow-y: auto;
-  }
-
-  .step-detail {
+  /* Badges */
+  .step-badges {
     display: flex;
-    flex-direction: column;
-    gap: 8px;
+    gap: 6px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
   }
 
   .step-type-badge {
     display: inline-block;
     padding: 2px 10px;
-    border-radius: 12px;
+    border-radius: 10px;
     font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.3px;
+  }
+
+  .step-type-onchain {
     background: #1f3a5f;
     color: #58a6ff;
-    width: fit-content;
   }
 
-  .step-detail h3 {
+  .step-type-offchain {
+    background: #2d1f3a;
+    color: #d2a8ff;
+  }
+
+  .step-actor-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    background: #21262d;
+    color: #c9d1d9;
+  }
+
+  /* Step title */
+  .step-title {
     font-size: 16px;
     color: #f0f6fc;
+    font-weight: 600;
+    margin-bottom: 6px;
   }
 
-  .step-detail p {
+  .step-future .step-title { color: #8b949e; }
+
+  /* Narrative */
+  .step-narrative {
     font-size: 14px;
     color: #8b949e;
-    line-height: 1.5;
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+
+  .step-active .step-narrative { color: #c9d1d9; }
+
+  /* On-chain details */
+  .onchain-details {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    animation: slideIn 0.4s ease;
+  }
+
+  @keyframes slideIn {
+    0% { opacity: 0; transform: translateY(8px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  /* State transition */
+  .state-transition {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    font-size: 13px;
+  }
+
+  .state-from {
+    color: #f85149;
+    font-weight: 600;
+    padding: 2px 8px;
+    background: rgba(248, 81, 73, 0.1);
+    border-radius: 4px;
+  }
+
+  .state-arrow { color: #8b949e; font-size: 16px; }
+
+  .state-to {
+    color: #3fb950;
+    font-weight: 600;
+    padding: 2px 8px;
+    background: rgba(63, 185, 80, 0.1);
+    border-radius: 4px;
+  }
+
+  /* Datum changes */
+  .datum-changes {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .datum-change {
+    padding: 8px 12px;
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    font-size: 12px;
+  }
+
+  .datum-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  .datum-header strong { color: #f0f6fc; font-size: 12px; }
+  .datum-header code {
+    font-size: 11px;
+    color: #d2a8ff;
+    background: rgba(210, 168, 255, 0.1);
+    padding: 1px 6px;
+    border-radius: 3px;
+  }
+
+  .datum-values {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .datum-before { color: #f85149; font-family: monospace; font-size: 11px; }
+  .datum-arrow { color: #8b949e; }
+  .datum-after { color: #3fb950; font-family: monospace; font-size: 11px; }
+
+  /* Sections */
+  .section-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: #8b949e;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 6px;
   }
 
   /* Signature badges */
@@ -337,22 +403,19 @@
   }
 
   .sig-badge {
-    display: inline-block;
-    padding: 2px 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
     border-radius: 10px;
     font-size: 11px;
     background: #2d1f3a;
     color: #d2a8ff;
     border: 1px solid #3d2b50;
-    animation: badge-fade 0.4s ease;
+    animation: fadeIn 0.3s ease;
   }
 
-  @keyframes badge-fade {
-    0% { opacity: 0; transform: scale(0.8); }
-    100% { opacity: 1; transform: scale(1); }
-  }
-
-  /* Validator check ticks */
+  /* Check ticks */
   .check-ticks {
     display: flex;
     gap: 6px;
@@ -361,73 +424,35 @@
 
   .check-tick {
     display: inline-block;
-    padding: 2px 8px;
+    padding: 3px 10px;
     border-radius: 10px;
     font-size: 11px;
     background: #1a3b2f;
     color: #3fb950;
     border: 1px solid #2a5a3f;
-    animation: tick-appear 0.3s ease both;
+    animation: tickIn 0.3s ease both;
   }
 
-  @keyframes tick-appear {
-    0% { opacity: 0; transform: translateY(4px); }
-    100% { opacity: 1; transform: translateY(0); }
+  @keyframes tickIn {
+    0% { opacity: 0; transform: scale(0.8); }
+    100% { opacity: 1; transform: scale(1); }
   }
 
-  /* Datum change info in step panel */
-  .datum-changes-info {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    margin-top: 4px;
-  }
-
-  .datum-change-info {
-    padding: 6px 10px;
-    background: #0d1117;
-    border: 1px solid #30363d;
-    border-radius: 4px;
-    font-size: 12px;
-  }
-
-  .datum-change-info strong {
-    display: block;
-    color: #f0f6fc;
-    margin-bottom: 2px;
-  }
-
-  .datum-field-name {
-    display: block;
-    color: #d2a8ff;
-    font-family: monospace;
-    font-size: 11px;
-    margin-bottom: 4px;
-  }
-
-  .datum-transition {
-    color: #8b949e;
-  }
-
-  .datum-val-before { color: #f85149; }
-  .datum-val-after { color: #3fb950; }
-
-  /* Generic animations */
-  @keyframes fade-in {
+  @keyframes fadeIn {
     0% { opacity: 0; }
     100% { opacity: 1; }
   }
 
   /* Responsive */
-  @media (max-width: 768px) {
-    .lanes { flex-wrap: wrap; }
-    .lane { min-width: 200px; border-right: none; border-bottom: 1px solid #30363d; }
-    .lane:last-child { border-bottom: none; }
+  @media (max-width: 600px) {
+    .process-header { flex-direction: column; }
+    .process-header-right { text-align: left; }
+    .deadline-track { width: 100%; }
   }
 </style>
 </head>
 <body>
 <div id="animator"></div>
-<script src="index.js"></script>
+<script src="index.js?v=5"></script>
 </body>
 </html>
