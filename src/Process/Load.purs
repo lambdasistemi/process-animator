@@ -2,14 +2,19 @@ module Process.Load where
 
 import Prelude
 
+import Control.Promise (Promise, toAffE)
+import Data.Either (Either(..))
 import Data.Maybe (Maybe(..))
+import Effect (Effect)
 import Effect.Aff (Aff, attempt)
 import Effect.Class (liftEffect)
-import Data.Either (Either(..))
 import Process.Parse (parseTurtle)
 import Process.Types (ProcessDef)
 
-foreign import fetchText :: String -> Aff String
+foreign import fetchTextImpl :: String -> Effect (Promise String)
+
+fetchText :: String -> Aff String
+fetchText url = toAffE (fetchTextImpl url)
 
 loadFromUrl :: String -> Aff (Maybe ProcessDef)
 loadFromUrl url = do
