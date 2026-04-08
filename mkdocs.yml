@@ -1,0 +1,14 @@
+site_name: Process Animator
+site_url: https://lambdasistemi.github.io/process-animator/
+repo_url: https://github.com/lambdasistemi/process-animator
+repo_name: lambdasistemi/process-animator
+
+theme:
+  name: material
+  palette:
+    scheme: slate
+    primary: deep purple
+    accent: amber
+
+nav:
+  - Home: index.md

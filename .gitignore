@@ -1,0 +1,16 @@
+# Build outputs
+output/
+.spago/
+node_modules/
+dist/
+result
+result-*
+
+# IDE
+.psc-ide-port
+.purs-repl
+*.swp
+*~
+
+# LLM investigation notes (local only)
+.llm/
