@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Process Animator</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+    background: #0d1117;
+    color: #c9d1d9;
+    min-height: 100vh;
+  }
+
+  .animator {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  /* Empty & Error */
+  .empty-state, .error-state {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; flex: 1; color: #8b949e;
+    text-align: center; padding: 60px 20px;
+  }
+  .empty-state h2, .error-state h2 { font-size: 28px; color: #f0f6fc; margin-bottom: 8px; }
+  .empty-state p { font-size: 14px; line-height: 1.6; margin-top: 4px; }
+  .error-state { color: #f85149; }
+  .error-state h2 { color: #f85149; }
+
+  /* Process view */
+  .process-view {
+    display: flex;
+    flex-direction: column;
+    max-width: 720px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 0 20px;
+  }
+
+  /* Header */
+  .process-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 24px 0 16px;
+    border-bottom: 1px solid #21262d;
+    gap: 20px;
+  }
+
+  .process-header h1 {
+    font-size: 22px;
+    color: #f0f6fc;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .process-desc {
+    font-size: 13px;
+    color: #8b949e;
+    line-height: 1.5;
+    margin-top: 4px;
+  }
+
+  .process-header-right {
+    flex-shrink: 0;
+    text-align: right;
+  }
+
+  .step-counter {
+    font-size: 13px;
+    color: #8b949e;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  /* Deadline */
+  .deadline {
+    margin-top: 4px;
+  }
+
+  .deadline-text {
+    font-size: 11px;
+    font-weight: 600;
+    color: #d29922;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+
+  .deadline-track {
+    height: 4px;
+    background: #21262d;
+    border-radius: 2px;
+    overflow: hidden;
+    width: 140px;
+  }
+
+  .deadline-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #3fb950, #d29922, #f85149);
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+
+  /* Chain state banner */
+  .chain-state-banner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    margin: 12px 0;
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+  }
+
+  .chain-label {
+    font-size: 12px;
+    color: #8b949e;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .chain-value {
+    font-size: 14px;
+    color: #8b949e;
+    font-weight: 600;
+  }
+
+  .chain-value-active {
+    color: #58a6ff;
+    animation: pulse 0.5s ease;
+  }
+
+  @keyframes pulse {
+    0% { opacity: 0.5; transform: scale(0.95); }
+    50% { transform: scale(1.02); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
+  /* Controls */
+  .controls {
+    display: flex;
+    gap: 8px;
+    padding: 12px 0;
+    justify-content: center;
+  }
+
+  .control-btn {
+    background: #21262d;
+    border: 1px solid #30363d;
+    color: #c9d1d9;
+    padding: 8px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: inherit;
+    transition: all 0.15s ease;
+  }
+
+  .control-btn:hover { background: #30363d; border-color: #8b949e; }
+  .control-btn:disabled { opacity: 0.3; cursor: default; }
+  .control-btn:disabled:hover { background: #21262d; border-color: #30363d; }
+  .control-btn-play { background: #1f3a5f; border-color: #58a6ff; color: #58a6ff; }
+  .control-btn-play:hover { background: #264d78; }
+
+  /* Timeline */
+  .timeline {
+    padding: 8px 0 40px;
+  }
+
+  /* Step card */
+  .step-card {
+    display: flex;
+    gap: 16px;
+    padding: 0 0 0 0;
+    transition: all 0.3s ease;
+  }
+
+  /* Step connector (number + line) */
+  .step-connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+    width: 36px;
+  }
+
+  .step-number {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    background: #21262d;
+    border: 2px solid #30363d;
+    color: #8b949e;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+  }
+
+  .step-active .step-number {
+    background: #1f3a5f;
+    border-color: #58a6ff;
+    color: #58a6ff;
+    box-shadow: 0 0 12px rgba(88, 166, 255, 0.3);
+  }
+
+  .step-completed .step-number {
+    background: #1a3b2f;
+    border-color: #3fb950;
+    color: #3fb950;
+  }
+
+  .step-line {
+    width: 2px;
+    flex: 1;
+    min-height: 16px;
+    background: #21262d;
+    transition: background 0.3s ease;
+  }
+
+  .step-completed .step-line { background: #3fb950; }
+  .step-active .step-line { background: #58a6ff; }
+
+  /* Step content */
+  .step-content {
+    flex: 1;
+    padding: 4px 0 24px;
+    min-width: 0;
+  }
+
+  .step-future .step-content { opacity: 0.4; }
+
+  /* Badges */
+  .step-badges {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 6px;
+    flex-wrap: wrap;
+  }
+
+  .step-type-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .step-type-onchain {
+    background: #1f3a5f;
+    color: #58a6ff;
+  }
+
+  .step-type-offchain {
+    background: #2d1f3a;
+    color: #d2a8ff;
+  }
+
+  .step-actor-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    background: #21262d;
+    color: #c9d1d9;
+  }
+
+  /* Step title */
+  .step-title {
+    font-size: 16px;
+    color: #f0f6fc;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .step-future .step-title { color: #8b949e; }
+
+  /* Narrative */
+  .step-narrative {
+    font-size: 14px;
+    color: #8b949e;
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+
+  .step-active .step-narrative { color: #c9d1d9; }
+
+  /* On-chain details */
+  .onchain-details {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    animation: slideIn 0.4s ease;
+  }
+
+  @keyframes slideIn {
+    0% { opacity: 0; transform: translateY(8px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  /* State transition */
+  .state-transition {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    font-size: 13px;
+  }
+
+  .state-from {
+    color: #f85149;
+    font-weight: 600;
+    padding: 2px 8px;
+    background: rgba(248, 81, 73, 0.1);
+    border-radius: 4px;
+  }
+
+  .state-arrow { color: #8b949e; font-size: 16px; }
+
+  .state-to {
+    color: #3fb950;
+    font-weight: 600;
+    padding: 2px 8px;
+    background: rgba(63, 185, 80, 0.1);
+    border-radius: 4px;
+  }
+
+  /* Datum changes */
+  .datum-changes {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .datum-change {
+    padding: 8px 12px;
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    font-size: 12px;
+  }
+
+  .datum-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  .datum-header strong { color: #f0f6fc; font-size: 12px; }
+  .datum-header code {
+    font-size: 11px;
+    color: #d2a8ff;
+    background: rgba(210, 168, 255, 0.1);
+    padding: 1px 6px;
+    border-radius: 3px;
+  }
+
+  .datum-values {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .datum-before { color: #f85149; font-family: monospace; font-size: 11px; }
+  .datum-arrow { color: #8b949e; }
+  .datum-after { color: #3fb950; font-family: monospace; font-size: 11px; }
+
+  /* Sections */
+  .section-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: #8b949e;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-bottom: 6px;
+  }
+
+  /* Signature badges */
+  .sig-badges {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .sig-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-size: 11px;
+    background: #2d1f3a;
+    color: #d2a8ff;
+    border: 1px solid #3d2b50;
+    animation: fadeIn 0.3s ease;
+  }
+
+  /* Check ticks */
+  .check-ticks {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .check-tick {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 10px;
+    font-size: 11px;
+    background: #1a3b2f;
+    color: #3fb950;
+    border: 1px solid #2a5a3f;
+    animation: tickIn 0.3s ease both;
+  }
+
+  @keyframes tickIn {
+    0% { opacity: 0; transform: scale(0.8); }
+    100% { opacity: 1; transform: scale(1); }
+  }
+
+  @keyframes fadeIn {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .process-header { flex-direction: column; }
+    .process-header-right { text-align: left; }
+    .deadline-track { width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div id="animator"></div>
+<script src="index.js?v=5"></script>
+</body>
+</html>
