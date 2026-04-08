@@ -1,0 +1,38 @@
+package:
+  name: process-animator
+  dependencies:
+    - prelude
+    - effect
+    - aff
+    - console
+    - halogen
+    - halogen-subscriptions
+    - arrays
+    - maybe
+    - either
+    - foldable-traversable
+    - tuples
+    - web-html
+    - web-dom
+    - strings
+    - ordered-collections
+    - refs
+    - aff-promise
+    - web-events
+    - foreign
+    - foreign-object
+    - dom-indexed
+    - integers
+    - numbers
+    - transformers
+    - datetime
+    - now
+  bundle:
+    module: Main
+    outfile: dist/index.js
+    platform: browser
+    type: app
+
+workspace:
+  packageSet:
+    registry: 72.1.0

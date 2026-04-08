@@ -3,6 +3,7 @@ output/
 .spago/
 node_modules/
 dist/
+!dist/index.html
 result
 result-*
 
